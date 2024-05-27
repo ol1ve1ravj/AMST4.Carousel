@@ -1,64 +1,48 @@
-﻿@model IEnumerable<AMST4_Carousel.MVC.Models.Product>
+﻿@model IEnumerable<Product>
 
 @{
-    ViewData["Title"] = "Lista de Produto";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Lista de Produto</h1>
+<h1>Index</h1>
 
 <p>
-    <a class="btn btn-success" asp-action="AddProduct"><i class="fa fa-plus-circle"></i> Cadastrar</a>
+    <a asp-action="AddProduct">Criar Produto</a>
 </p>
-<table id="myTable" class="table">
+<table class="table">
     <thead>
         <tr>
             <th>
-                Nome
+                @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                Marca
+                @Html.DisplayNameFor(model => model.ImageUrl)
             </th>
             <th>
-                Url da Imagem
-            </th>
-            <th>
-                Preço
+                @Html.DisplayNameFor(model => model.Price)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr class="p-3">
-            <td class="m-auto p-3">
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td class="m-auto p-3">
-                @Html.DisplayFor(modelItem => item.Brand)
-            </td>
-            <td class="m-auto p-3">
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td class="m-auto  p-3">
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                    <a class="btn btn-success mt-1 me-1 pt-1 pb-1" asp-action="EditProduct" asp-route-id="@item.Id"><i class="fa fa-edit"></i></a>
-                    <a class="btn btn-primary mt-1 me-1 pt-1 pb-1"asp-action="DetailsProduct" asp-route-id="@item.Id"><i class="fa fa-search"></i></a>
-                    <a class="btn btn-danger mt-1 pt-1 pb-1"asp-action="DeleteProduct" asp-route-id="@item.Id"><i class="fa fa-trash"></i></a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ImageUrl)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    <a asp-action="EditProduct" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="DetailsProduct" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="DeleteProduct" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-
-@section Scripts {
-    <script>
-        var table = new DataTable('#myTable', {
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.0.7/i18n/pt-BR.json',
-            },
-        });
-    </script>
-
-}

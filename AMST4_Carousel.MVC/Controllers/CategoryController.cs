@@ -49,14 +49,22 @@ namespace AMST4_Carousel.MVC.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCategory([Bind("Id,Description,ImageUrl,IsActive,CreateDate")] Category category)
+        public async Task<IActionResult> AddCategory(Category category, IFormFile image)
         {
-
+            if (image != null)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "Category", fileName);
+                using (var stream = new FileStream(filepath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+                category.ImageUrl = Path.Combine("images", "Category", fileName);
+            }
             category.Id = Guid.NewGuid();
             _context.Add(category);
             await _context.SaveChangesAsync();
-            return RedirectToAction("CategoryList");
+            return RedirectToAction(nameof(CategoryList));
 
         }
         //Fim Create
@@ -77,8 +85,7 @@ namespace AMST4_Carousel.MVC.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCategory(Guid id, [Bind("Id,Description,ImageUrl,IsActive,CreateDate")] Category category)
+        public async Task<IActionResult> EditCategory(Guid id, Category category)
         {
             if (id != category.Id)
             {
@@ -123,7 +130,6 @@ namespace AMST4_Carousel.MVC.Controllers
 
 
         [HttpPost, ActionName("DeleteCategory")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmedCategory(Guid id)
         {
             var category = await _context.Category.FindAsync(id);
@@ -133,7 +139,7 @@ namespace AMST4_Carousel.MVC.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("CategoryList");
+            return RedirectToAction(nameof(CategoryList));
         }
 
         private bool CategoryExists(Guid id)

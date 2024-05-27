@@ -1,5 +1,8 @@
 ﻿namespace AMST4_Carousel.MVC.Models
 {
+    /// <summary>
+    /// <Author>Andrey Bertoletti</Author>
+    /// </summary>
     public class Product
     {
         public Guid Id { get; set; }

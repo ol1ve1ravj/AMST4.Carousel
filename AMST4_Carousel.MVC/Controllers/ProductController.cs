@@ -54,15 +54,23 @@ namespace AMST4_Carousel.MVC.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProduct([Bind("Id,Name,Brand,Description,ImageUrl,Price,Stock,IsActive,CreateDate,CategoryId")] Product product)
+        public async Task<IActionResult> AddProduct(Product product,IFormFile image)
         {
-
+            if(image != null)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "Product", fileName);
+                using (var stream = new FileStream(filepath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+                product.ImageUrl= Path.Combine("images", "Product", fileName);
+            }
 
             product.Id = Guid.NewGuid();
             _context.Add(product);
             await _context.SaveChangesAsync();
-            return RedirectToAction("ProductList");
+            return RedirectToAction(nameof(ProductList));
 
         }
         //Fim Create
@@ -84,8 +92,7 @@ namespace AMST4_Carousel.MVC.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProduct(Guid id, [Bind("Id,Name,Brand,Description,ImageUrl,Price,Stock,IsActive,CreateDate,CategoryId")] Product product)
+        public async Task<IActionResult> EditProduct(Guid id, Product product)
         {
             if (id != product.Id)
             {
@@ -107,11 +114,9 @@ namespace AMST4_Carousel.MVC.Controllers
                     throw;
                 }
             }
-            return RedirectToAction("ProductList");
+            return RedirectToAction(nameof(ProductList));
 
         }
-        //Fim Edit
-        //Começo Delete
         public async Task<IActionResult> DeleteProduct(Guid? id)
         {
             if (id == null)
@@ -132,7 +137,6 @@ namespace AMST4_Carousel.MVC.Controllers
 
 
         [HttpPost, ActionName("DeleteProduct")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var product = await _context.Product.FindAsync(id);
@@ -142,13 +146,12 @@ namespace AMST4_Carousel.MVC.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("ProductList");
+            return RedirectToAction(nameof(ProductList));
         }
 
         private bool ProductExists(Guid id)
         {
             return _context.Product.Any(e => e.Id == id);
         }
-        //Fim Delete
     }
 }
